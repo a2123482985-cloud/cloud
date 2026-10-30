@@ -25,7 +25,7 @@ video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;t
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><h1>BRAVE MOVER · DUO ARENA</h1><p>高精度双人识别模式 · Heavy Pose + 时序平滑 + 全身质量检测</p></div></div>
+  <div class="top"><div class="brand"><h1>BRAVE MOVER · DUO ARENA</h1><p>镜像一致动作映射 · 左手→左手 / 右手→右手 · 本地 / 异地 / 回声统一</p></div></div>
   <section class="stage">
     <video id="video" autoplay playsinline muted></video><canvas id="canvas"></canvas><div class="veil"></div><div class="scan"></div>
     <div id="guideA" class="guide a"><div id="guideALabel" class="guideLabel">勇士 A · 请站入区域</div></div>
@@ -50,7 +50,7 @@ video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;t
   </div>
 
   <section class="socialPanel">
-    <div class="socialHead"><div><strong>CROSS-TIME CO-PLAY · 跨时空共玩</strong><p>同空间实时协作 / 异地数字化身联机 / 跨时间回声重播</p></div><span class="socialPill">BRAVE MOVER 2.0</span></div>
+    <div class="socialHead"><div><strong>CROSS-TIME CO-PLAY · 跨时空共玩</strong><p>同空间 / 异地实时 / 跨时间回声 · 所有角色采用一致的左右镜像映射</p></div><span class="socialPill">BRAVE MOVER 2.0</span></div>
     <div class="socialTabs">
       <button class="socialTab active" data-social="local">同空间共玩</button>
       <button class="socialTab" data-social="remote">异地实时共玩</button>
@@ -58,12 +58,12 @@ video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;t
     </div>
     <div id="localPanel" class="socialHint">两名玩家在同一摄像头画面中完成动作。系统继续使用双人骨骼识别、同步计分与语音引导。</div>
     <div id="remotePanel" class="socialBody" hidden>
-      <p>两台设备分别打开本页面。玩家 A 点击「创建房间」并把房间码发给玩家 B；玩家 B 输入房间码后点击「加入房间」。连接成功后，双方都能看到对方的实时动作化身。请两端都开启摄像头。</p>
+      <p>两台设备分别打开本页面。玩家 A 点击「创建房间」并把房间码发给玩家 B；玩家 B 输入房间码后点击「加入房间」。连接成功后，双方都能看到对方的实时动作化身。左右手按玩家自身视角映射：抬左手，对方屏幕中的化身也抬左手。请两端都开启摄像头。</p>
       <div class="socialActions"><button id="createRoomBtn" class="socialBtn primary">创建房间</button><input id="roomInput" class="socialInput" placeholder="粘贴好友的房间码 / Peer ID"><button id="joinRoomBtn" class="socialBtn">加入房间</button><button id="copyRoomBtn" class="socialBtn" disabled>复制房间码</button></div>
       <div id="remoteStatus" class="socialStatus">尚未连接 · 免费 WebRTC 点对点演示</div>
     </div>
     <div id="echoPanel" class="socialBody" hidden>
-      <p>录制玩家 A 最多 30 秒的动作轨迹，导出回声文件并发送给好友。好友在之后的时间导入文件，即可看到半透明数字化身重现动作。回声文件不包含摄像头视频。</p>
+      <p>录制玩家 A 最多 30 秒的动作轨迹，导出回声文件并发送给好友。好友之后导入文件，可看到半透明化身重现动作；左手、右手语义与实时模式一致。回声文件不包含摄像头视频。</p>
       <div class="socialActions"><button id="recordEchoBtn" class="socialBtn primary">开始录制回声</button><button id="stopEchoBtn" class="socialBtn" disabled>结束录制</button><button id="exportEchoBtn" class="socialBtn" disabled>导出回声文件</button><label for="echoFile" class="socialBtn socialLabel">导入好友回声</label><input id="echoFile" class="socialFile" type="file" accept=".json,application/json"><button id="playEchoBtn" class="socialBtn" disabled>播放回声化身</button><button id="stopPlaybackBtn" class="socialBtn" disabled>停止播放</button></div>
       <div id="echoStatus" class="socialStatus">尚无回声记录 · 先开启摄像头并录制动作</div>
     </div>
@@ -75,7 +75,7 @@ video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;t
     <div class="qualityCard">环境亮度 <b id="lightText">待检测</b><div class="qbar"><i id="lightBar"></i></div></div>
   </div>
   <div id="status" class="statusline">尚未启动</div>
-  <div class="legend"><span><i id="dotA" class="dot"></i>勇士A识别</span><span><i id="dotB" class="dot"></i>勇士B识别</span><span>推荐深色/有颜色背景</span><span>避免白衣 + 白墙 / 灰衣 + 灰墙</span></div>
+  <div class="legend"><span><i id="dotA" class="dot"></i>勇士A识别</span><span><i id="dotB" class="dot"></i>勇士B识别</span><span>左右镜像：左手对应左手</span><span>推荐深色/有颜色背景</span><span>避免白衣 + 白墙 / 灰衣 + 灰墙</span></div>
 </div>
 <canvas id="lightCanvas" width="48" height="27" hidden></canvas>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -117,7 +117,7 @@ function bindConnection(c){conn=c;c.on('open',()=>{$('remoteStatus').textContent
 function createRoom(){if(!window.Peer){$('remoteStatus').textContent='联机组件加载失败，请刷新页面后重试';return}disconnectPeer();$('remoteStatus').textContent='正在创建免费联机房间…';peer=new window.Peer(undefined,peerOptions());peer.on('open',id=>{$('roomInput').value=id;$('remoteStatus').textContent='房间已创建 · 将房间码发给好友';$('copyRoomBtn').disabled=false});peer.on('connection',c=>bindConnection(c));peer.on('error',e=>{$('remoteStatus').textContent='联机服务暂不可用：'+(e.message||e.type||'请稍后重试')})}
 function joinRoom(){const id=$('roomInput').value.trim();if(!id){$('remoteStatus').textContent='请先输入好友的房间码';return}if(!window.Peer){$('remoteStatus').textContent='联机组件加载失败，请刷新页面后重试';return}disconnectPeer();$('remoteStatus').textContent='正在连接好友房间…';peer=new window.Peer(undefined,peerOptions());peer.on('open',()=>{conn=peer.connect(id,{reliable:true});bindConnection(conn)});peer.on('error',e=>{$('remoteStatus').textContent='连接失败：请检查房间码或网络（'+(e.message||e.type||'未知错误')+'）'})}
 function sendRemotePose(l,now){if(!conn||!conn.open||now-lastSentAt<120)return;lastSentAt=now;try{conn.send({type:'pose',name:'Brave Mover Player',landmarks:l.map(p=>[+p.x.toFixed(3),+p.y.toFixed(3),+(p.z||0).toFixed(3),+((p.visibility)||0).toFixed(2)]),count:P[0].count,state:P[0].phase})}catch(e){}}
-function drawAvatar(l,color,alpha){if(!l||!canvas.width)return;const pts=l.map(p=>({...p,x:.24+(.5-p.x)*.34,y:.10+p.y*.76}));ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=18;ctx.lineWidth=7;ctx.lineCap='round';ctx.lineJoin='round';for(const[a,b]of CON){if((pts[a]?.visibility??0)<.12||(pts[b]?.visibility??0)<.12)continue;ctx.beginPath();ctx.moveTo(pts[a].x*canvas.width,pts[a].y*canvas.height);ctx.lineTo(pts[b].x*canvas.width,pts[b].y*canvas.height);ctx.stroke()}for(const k of CORE){const p=pts[k];if(!p||(p.visibility??0)<.12)continue;ctx.beginPath();ctx.arc(p.x*canvas.width,p.y*canvas.height,6,0,Math.PI*2);ctx.fill()}const head=pts[0];if(head){ctx.beginPath();ctx.arc(head.x*canvas.width,head.y*canvas.height,Math.max(12,canvas.width*.012),0,Math.PI*2);ctx.stroke()}ctx.restore()}
+function drawAvatar(l,color,alpha){if(!l||!canvas.width)return;/* 摄像头与 canvas 均使用 CSS scaleX(-1)。保留 MediaPipe 左右关节点语义，只把原始 x 映射到远程化身区域；由统一的 CSS 镜像完成最终翻转，避免二次反转。 */const pts=l.map(p=>({...p,x:.10+p.x*.35,y:.10+p.y*.76}));ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=18;ctx.lineWidth=7;ctx.lineCap='round';ctx.lineJoin='round';for(const[a,b]of CON){if((pts[a]?.visibility??0)<.12||(pts[b]?.visibility??0)<.12)continue;ctx.beginPath();ctx.moveTo(pts[a].x*canvas.width,pts[a].y*canvas.height);ctx.lineTo(pts[b].x*canvas.width,pts[b].y*canvas.height);ctx.stroke()}for(const k of CORE){const p=pts[k];if(!p||(p.visibility??0)<.12)continue;ctx.beginPath();ctx.arc(p.x*canvas.width,p.y*canvas.height,6,0,Math.PI*2);ctx.fill()}const head=pts[0];if(head){ctx.beginPath();ctx.arc(head.x*canvas.width,head.y*canvas.height,Math.max(12,canvas.width*.012),0,Math.PI*2);ctx.stroke()}ctx.restore()}
 function maybeSpeakGuide(p,i,now){if(!p||!p.msg)return;const msg=p.msg;if(!/后退|左侧|右侧|头和脚/.test(msg))return;if(msg===guideLast[i]&&now-guideAt[i]<5000)return;if(now-guideAt[i]<4200)return;guideLast[i]=msg;guideAt[i]=now;speak('勇士'+(i===0?'A':'B')+'，'+msg+'。调整好后继续挑战。')}
 function captureEcho(l,now){if(!recording||now-lastRecord<ECHO_INTERVAL)return;lastRecord=now;echoFrames.push({t:Math.round(now-recordStart),p:l.map(p=>[+p.x.toFixed(3),+p.y.toFixed(3),+((p.z)||0).toFixed(3),+((p.visibility)||0).toFixed(2)])});if(now-recordStart>=ECHO_LIMIT)stopEchoRecord()}
 function startEchoRecord(){if(!running){$('echoStatus').textContent='请先开启摄像头并站入画面，再开始录制';return}echoFrames=[];recording=true;recordStart=performance.now();lastRecord=0;$('recordEchoBtn').disabled=true;$('stopEchoBtn').disabled=false;$('exportEchoBtn').disabled=true;$('echoStatus').textContent='正在录制玩家 A 的动作轨迹 · 最长 30 秒';speak('回声记录开始，请完成你的动作挑战。')}
