@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Brave Mover Duo · Voice Coach</title>
+<style>
+:root{--bg:#050b14;--panel:rgba(7,18,32,.82);--line:rgba(120,205,255,.30);--text:#f4fbff;--muted:#9db6c9;--cyan:#63ddff;--violet:#a986ff;--lime:#c4ff71;--warn:#ffd36a;--bad:#ff7184}
+*{box-sizing:border-box}html,body{margin:0;background:#050b14;color:var(--text);font-family:Inter,system-ui,"Microsoft YaHei",sans-serif;min-height:100%}body{overflow-x:hidden}.app{width:100%;padding:10px 12px 14px}.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}.brand h1{margin:0;font-size:18px}.brand p{margin:3px 0 0;color:var(--muted);font-size:12px}.stage{position:relative;width:100%;aspect-ratio:16/9;background:radial-gradient(circle at 50% 45%,#13233d 0,#08111f 48%,#02070c 100%);border:1px solid var(--line);border-radius:22px;overflow:hidden}video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}.veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.28),transparent 18%,transparent 74%,rgba(0,0,0,.45));pointer-events:none}.guide{position:absolute;top:11%;bottom:10%;width:30%;border:2px dashed rgba(99,221,255,.38);border-radius:42% 42% 18% 18%;pointer-events:none}.guide.a{left:12%}.guide.b{right:12%;border-color:rgba(169,134,255,.40)}.guide.ok{border-style:solid;box-shadow:0 0 30px rgba(99,221,255,.17) inset}.guide.bad{border-color:rgba(255,113,132,.65)}.label{position:absolute;top:-32px;left:50%;transform:translateX(-50%);padding:6px 11px;border-radius:999px;background:rgba(5,15,27,.80);border:1px solid var(--line);font-size:12px;white-space:nowrap}.floor{position:absolute;left:8%;right:8%;bottom:8%;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),var(--violet),transparent)}.hud{position:absolute;inset:0;padding:15px;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between}.hudTop{display:grid;grid-template-columns:1fr auto 1fr;gap:10px}.card{background:var(--panel);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:15px}.player{padding:10px 12px;max-width:190px}.player.right{justify-self:end;text-align:right}.tag{font-size:11px;color:#cfe9f8}.count{font-size:34px;font-weight:900}.state{font-size:11px;color:var(--muted)}.team{text-align:center;padding:8px 18px;min-width:260px}.mode{font-size:12px;color:#d4edfa}.score{font-size:38px;font-weight:900;color:var(--lime)}.combo{font-size:11px;color:var(--muted)}.feedback{position:absolute;left:50%;top:22%;transform:translate(-50%,-50%);min-width:min(600px,76%);padding:12px 20px;text-align:center;font-size:clamp(18px,2vw,32px);font-weight:900;background:rgba(6,18,31,.82);border:1px solid var(--line);border-radius:18px}.feedback.good{color:var(--lime)}.feedback.warn{color:var(--warn)}.feedback.bad{color:#ff9aaa}.fairyWrap{display:flex;justify-content:center}.fairy{display:flex;align-items:center;gap:10px;max-width:min(840px,92%);padding:9px 13px}.orb{width:42px;height:42px;flex:0 0 42px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff 0 8%,#6deaff 18%,#6e5dff 55%,#17255a 75%);box-shadow:0 0 26px rgba(99,221,255,.55)}.fairyText{font-size:13px;line-height:1.45;color:#d8eef8}.dock{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:9px}.dock button{font:inherit;color:white;background:#0c1c2f;border:1px solid #29435e;border-radius:12px;padding:10px 14px;cursor:pointer}.dock .primary{background:linear-gradient(135deg,#147493,#6040a4);border-color:#6bc9f5;font-weight:800}.dock .active{border-color:var(--cyan);box-shadow:inset 0 0 0 1px var(--cyan)}.status{text-align:center;color:var(--muted);font-size:12px;margin-top:8px}.voiceLog{display:flex;justify-content:center;margin-top:7px}.voiceChip{max-width:860px;width:100%;padding:8px 12px;border:1px solid rgba(120,205,255,.18);background:rgba(7,18,32,.45);border-radius:12px;color:#9fb9cc;font-size:11px;text-align:center}.legend{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:6px;font-size:11px;color:#7893a7}@media(max-width:900px){.app{padding:6px}.brand p{display:none}.stage{border-radius:14px}.team{min-width:170px}.score{font-size:28px}.player{padding:8px}.count{font-size:28px}.guide{width:34%}.guide.a{left:7%}.guide.b{right:7%}.feedback{top:26%;font-size:18px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div class="brand"><h1>BRAVE MOVER · VOICE COACH</h1><p>双人高精度识别 + 实时站位语音引导 + 动作协作反馈</p></div></div>
+  <section class="stage">
+    <video id="video" autoplay playsinline muted></video><canvas id="canvas"></canvas><div class="veil"></div>
+    <div id="guideA" class="guide a"><div id="guideALabel" class="label">勇士 A · 请站入区域</div></div>
+    <div id="guideB" class="guide b"><div id="guideBLabel" class="label">勇士 B · 请站入区域</div></div>
+    <div class="floor"></div>
+    <div class="hud">
+      <div class="hudTop">
+        <div class="card player"><div class="tag">勇士 A</div><div id="ha" class="count">0</div><div id="sa" class="state">等待识别</div></div>
+        <div class="card team"><div id="modeTitle" class="mode">同步深蹲</div><div id="score" class="score">0</div><div id="combo" class="combo">TEAM SCORE</div></div>
+        <div class="card player right"><div class="tag">勇士 B</div><div id="hb" class="count">0</div><div id="sb" class="state">等待识别</div></div>
+      </div>
+      <div id="feedback" class="feedback warn">点击开启后，曜灵会用语音引导两人站到正确位置</div>
+      <div class="fairyWrap"><div class="card fairy"><div class="orb"></div><div id="fairy" class="fairyText">曜灵：“我会告诉你往左、往右、后退或调整站位。”</div></div></div>
+    </div>
+  </section>
+  <div class="dock">
+    <button id="start" class="primary">开启摄像头 + 语音教练</button>
+    <button class="modeBtn active" data-id="squat">深蹲</button>
+    <button class="modeBtn" data-id="punch">拳击</button>
+    <button class="modeBtn" data-id="knee">高抬腿</button>
+    <button id="testVoice">测试语音</button>
+    <button id="reset">重置</button><button id="voice">语音：开</button>
+  </div>
+  <div id="status" class="status">尚未启动</div>
+  <div class="voiceLog"><div id="voiceLog" class="voiceChip">最近语音：暂无</div></div>
+  <div class="legend"><span>站位语音优先级：完整入镜 → 左右位置 → 动作反馈</span><span>同类提醒约 4–8 秒内不会重复轰炸</span></div>
+</div>
+<script type="module">
+import {FilesetResolver,PoseLandmarker} from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.2.0/+esm';
+const $=id=>document.getElementById(id),video=$('video'),canvas=$('canvas'),ctx=canvas.getContext('2d');
+const MODES={squat:{name:'同步深蹲'},punch:{name:'交替拳击'},knee:{name:'同步高抬腿'}};
+let mode='squat',landmarker=null,stream=null,running=false,raf=0,lastVideo=-1,voiceOn=true,team=0,combo=0,lastTeam=[0,0],expected=0;
+const P=[{count:0,phase:'ready',last:0},{count:0,phase:'ready',last:0}],smooth=[null,null];
+const voiceState=[{last:'',lastAt:0},{last:'',lastAt:0}],globalVoice={last:'',lastAt:0};
+const CON=[[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[27,29],[29,31],[24,26],[26,28],[28,30],[30,32]];
+const CORE=[0,11,12,13,14,15,16,23,24,25,26,27,28,31,32];
+function angle(a,b,c){const u=[a.x-b.x,a.y-b.y],v=[c.x-b.x,c.y-b.y],m=Math.hypot(...u)*Math.hypot(...v);if(!m)return 0;return Math.acos(Math.max(-1,Math.min(1,(u[0]*v[0]+u[1]*v[1])/m)))*180/Math.PI}
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function hip(l){return{x:(l[23].x+l[24].x)/2,y:(l[23].y+l[24].y)/2}}
+function smoothPose(i,l){if(!smooth[i]){smooth[i]=l.map(p=>({...p}));return smooth[i]}const a=.68;smooth[i]=l.map((p,k)=>{const q=smooth[i][k]||p;return{...p,x:a*p.x+(1-a)*q.x,y:a*p.y+(1-a)*q.y,z:a*(p.z||0)+(1-a)*(q.z||0),visibility:Math.max(p.visibility||0,(q.visibility||0)*.90)}});return smooth[i]}
+function avgVisibility(l){return CORE.reduce((s,k)=>s+Math.max(0,Math.min(1,l[k]?.visibility||0)),0)/CORE.length}
+function setFeedback(t,type='warn'){$('feedback').textContent=t;$('feedback').className='feedback '+type}
+function rawSpeak(text){if(!voiceOn||!('speechSynthesis'in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='zh-CN';u.rate=1.02;u.pitch=1.04;u.volume=1;window.speechSynthesis.speak(u);$('voiceLog').textContent='最近语音：'+text;$('fairy').textContent='曜灵：“'+text+'”'}
+function speakGlobal(text,minGap=2800){const now=Date.now();if(globalVoice.last===text&&now-globalVoice.lastAt<7000)return;if(now-globalVoice.lastAt<minGap)return;globalVoice.last=text;globalVoice.lastAt=now;rawSpeak(text)}
+function speakPlayer(i,text){const now=Date.now(),s=voiceState[i];if(s.last===text&&now-s.lastAt<8000)return;if(now-s.lastAt<3800)return;s.last=text;s.lastAt=now;rawSpeak(text)}
+function reset(){P.forEach(x=>Object.assign(x,{count:0,phase:'ready',last:0}));smooth[0]=smooth[1]=null;team=0;combo=0;lastTeam=[0,0];expected=0;updateUI([]);setFeedback('重新准备','warn')}
+function setMode(id){mode=id;document.querySelectorAll('.modeBtn').forEach(b=>b.classList.toggle('active',b.dataset.id===id));$('modeTitle').textContent=MODES[id].name;reset();speakGlobal('已切换到'+MODES[id].name,1200)}
+function playerName(i){return i===0?'勇士A':'勇士B'}
+function event(i,now,label){P[i].count++;P[i].last=now;if(mode==='punch'){if(i===expected){team+=100;combo++;expected=1-i;setFeedback('接力成功！ COMBO × '+combo,'good');if(combo===3||combo===6)speakGlobal('接力成功，继续保持这个节奏',2200)}else{combo=0;expected=1-i;setFeedback('请等待队友','warn');speakGlobal(playerName(i)+'先等等，让队友接上',2200)}}else{lastTeam[i]=now;const o=1-i;if(Math.abs(lastTeam[i]-lastTeam[o])<1200){team+=100+Math.min(combo,10)*10;combo++;lastTeam=[0,0];setFeedback('同步成功！ COMBO × '+combo,'good');if(combo===3||combo===6)speakGlobal('很好，同步成功，继续保持',2200)}else setFeedback(playerName(i)+'完成，等待队友','warn')}}
+function detect(i,l,now){const s=P[i];let text='识别中';if(mode==='squat'){const k=(angle(l[23],l[25],l[27])+angle(l[24],l[26],l[28]))/2;if(k<105&&s.phase!=='down'){s.phase='down';text='下蹲到位'}else if(k>155&&s.phase==='down'&&now-s.last>500){s.phase='up';event(i,now,'深蹲');text='完成一次'}else text=k<130?'保持下蹲':'准备下蹲'}else if(mode==='punch'){const sh=Math.max(.08,dist(l[11],l[12]));const le=Math.abs(l[15].x-l[11].x)>sh*.95&&Math.abs(l[15].y-l[11].y)<sh*.72;const re=Math.abs(l[16].x-l[12].x)>sh*.95&&Math.abs(l[16].y-l[12].y)<sh*.72;const ex=le||re;if(ex&&s.phase!=='punch'&&now-s.last>300){s.phase='punch';event(i,now,'出拳');text=le?'左拳':'右拳'}else if(!ex){s.phase='ready';text='准备出拳'}}else{const hy=(l[23].y+l[24].y)/2,up=l[25].y<hy+.10||l[26].y<hy+.10;if(up&&s.phase!=='up'){s.phase='up';text='抬膝'}else if(!up&&s.phase==='up'&&now-s.last>300){s.phase='down';event(i,now,'高抬腿');text='完成一次'}else text=up?'抬高':'继续'}return text}
+function placement(i,l){const name=playerName(i);const vis=avgVisibility(l);const mirroredX=1-hip(l).x;const target=i===0?.32:.68;const nose=l[0],feetY=Math.max(l[31]?.y||1,l[32]?.y||1);const bodyH=feetY-(nose?.y||0);let code='ok',text='站位正确',voice='';
+if(vis<.48){code='weak';text='识别不稳定';voice=name+'，我看不清你，请面对摄像头并保持光线充足'}
+else if((nose?.y||0)<.025||feetY>.985||bodyH>.90){code='back';text='请后退一点';voice=name+'，请后退一点，让头和脚都完整进入画面'}
+else if(bodyH<.48){code='front';text='可以靠近一点';voice=name+'，可以稍微靠近一点'}
+else if(mirroredX<target-.075){code='right';text='往右一点';voice=name+'，往右一点'}
+else if(mirroredX>target+.075){code='left';text='往左一点';voice=name+'，往左一点'}
+return{code,text,voice,ok:code==='ok'} }
+function draw(l,color){ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;for(const[a,b]of CON){if(!l[a]||!l[b])continue;ctx.beginPath();ctx.moveTo(l[a].x*canvas.width,l[a].y*canvas.height);ctx.lineTo(l[b].x*canvas.width,l[b].y*canvas.height);ctx.stroke()}for(const p of l){ctx.beginPath();ctx.arc(p.x*canvas.width,p.y*canvas.height,3.5,0,Math.PI*2);ctx.fill()}}
+function updateGuide(i,p){const g=$(i===0?'guideA':'guideB'),lab=$(i===0?'guideALabel':'guideBLabel');g.classList.toggle('ok',p.ok);g.classList.toggle('bad',!p.ok);lab.textContent=playerName(i)+' · '+p.text}
+function updateUI(poses){$('ha').textContent=P[0].count;$('hb').textContent=P[1].count;$('score').textContent=team;$('combo').textContent=combo?'COMBO × '+combo:'TEAM SCORE';if(!poses[0])$('sa').textContent='等待识别';if(!poses[1])$('sb').textContent='等待识别'}
+function chooseVoiceGuidance(poses){if(!poses.length)return;if(poses.length<2){speakGlobal('还缺一位勇士，请两个人一起进入画面',4500);return}for(let i=0;i<2;i++){const p=placement(i,poses[i]);updateGuide(i,p);if(!p.ok&&p.voice){speakPlayer(i,p.voice);return}}if(poses.length===2)speakGlobal('很好，两位勇士站位正确，可以开始',6000)}
+async function start(){try{rawSpeak('语音教练已启动');$('status').textContent='正在申请摄像头权限…';stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30}},audio:false});video.srcObject=stream;await video.play();canvas.width=video.videoWidth||1920;canvas.height=video.videoHeight||1080;$('status').textContent='正在加载高精度人体模型…';const vision=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.2.0/wasm');landmarker=await PoseLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/1/pose_landmarker_heavy.task',delegate:'GPU'},runningMode:'VIDEO',numPoses:2,minPoseDetectionConfidence:.35,minPosePresenceConfidence:.35,minTrackingConfidence:.45});running=true;$('status').textContent='语音教练运行中';speakGlobal('两位勇士请分别站到左右区域，我会告诉你们怎么调整',500);cancelAnimationFrame(raf);loop()}catch(e){console.error(e);$('status').textContent='启动失败：'+(e.name==='NotAllowedError'?'请允许摄像头权限':e.message);speakGlobal('摄像头启动失败，请检查浏览器权限',500)}}
+async function loop(){if(!running)return;const now=performance.now();if(video.readyState>=2&&video.currentTime!==lastVideo){lastVideo=video.currentTime;const r=landmarker.detectForVideo(video,now);ctx.clearRect(0,0,canvas.width,canvas.height);const raw=(r.landmarks||[]).slice().sort((a,b)=>hip(b).x-hip(a).x).slice(0,2);const poses=raw.map((l,i)=>smoothPose(i,l));poses.forEach((l,i)=>{draw(l,i===0?'#63ddff':'#a986ff');const p=placement(i,l);updateGuide(i,p);if(p.ok){const s=detect(i,l,now);$(i===0?'sa':'sb').textContent=s}else $(i===0?'sa':'sb').textContent=p.text});updateUI(poses);chooseVoiceGuidance(poses);if(poses.length===2&&poses.every((l,i)=>placement(i,l).ok))setFeedback('站位正确 · 开始 '+MODES[mode].name,'good');else if(poses.length<2)setFeedback('请两位勇士同时完整进入画面','bad');else setFeedback('按照曜灵语音调整站位','warn')}raf=requestAnimationFrame(loop)}
+$('start').onclick=start;$('reset').onclick=reset;$('testVoice').onclick=()=>rawSpeak('语音测试正常。勇士A往右一点，勇士B后退一点。');$('voice').onclick=()=>{voiceOn=!voiceOn;$('voice').textContent='语音：'+(voiceOn?'开':'关');if(!voiceOn)speechSynthesis.cancel()};document.querySelectorAll('.modeBtn').forEach(b=>b.onclick=()=>setMode(b.dataset.id));
+</script>
+</body>
+</html>
